@@ -10,7 +10,7 @@ annular = 5
 
 
 start = 40
-coils = 2
+coils = 5
 numlayers = 4
 
 # Crunch some numbers and get constants
@@ -25,13 +25,13 @@ layers = [[]]
 vias = []
 
 
+# .zip( (0...numlayers).to_a)
+# .map{|c|c.first + c.last*coils}
 breakpoints = [0,90,180,270]
-  .zip( (0...numlayers).to_a)
-  .map{|c|c.reduce(:*)}
   .map{|c|c-45}
-  .map{|c|c+360*coils}
+  .each_with_index.map{|c,i|c+360*coils*i}
   .map{|c|c*Math::PI/180.0}
-p breakpoints
+p break_angles: breakpoints.map{|a|a/Math::PI*180}
 
 (0..(numlayers*coils*2*Math::PI)).step(angle_res) do |angle|
   layers.last << [ Math::cos(angle), Math::sin(angle) ].map{|c|c*radius}
@@ -44,8 +44,12 @@ p breakpoints
     vias << layers.last.last
     # Switch to the next layer of the coil
     layers << []
+    layers.last << [ Math::cos(angle), Math::sin(angle) ].map{|c|c*(radius + jog) }
+    radius = start
+    layers.last << [ Math::cos(angle), Math::sin(angle) ].map{|c|c*(radius - jog) }
+    vias << layers.last.last
+
     # restart the winding
-    # radius = start
   else
     radius += rdiff
   end
