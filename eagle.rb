@@ -1,7 +1,7 @@
-HEAD= <<~HEAD
+EAGLE_HEADER= <<~HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="8.6.0">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="yes"/>
@@ -11,6 +11,7 @@ HEAD= <<~HEAD
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="2" visible="yes" active="yes"/>
+<layer number="3" name="Route3" color="4" fill="2" visible="yes" active="yes"/>
 <layer number="15" name="Route15" color="1" fill="2" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
@@ -99,15 +100,15 @@ design rules under a new name.
 <param name="rvViaInner" value="0.25"/>
 <param name="rvMicroViaOuter" value="0.25"/>
 <param name="rvMicroViaInner" value="0.25"/>
-<param name="rlMinPadTop" value="10mil"/>
+<param name="rlMinPadTop" value="5mil"/>
 <param name="rlMaxPadTop" value="20mil"/>
-<param name="rlMinPadInner" value="10mil"/>
+<param name="rlMinPadInner" value="5mil"/>
 <param name="rlMaxPadInner" value="20mil"/>
-<param name="rlMinPadBottom" value="10mil"/>
+<param name="rlMinPadBottom" value="5mil"/>
 <param name="rlMaxPadBottom" value="20mil"/>
-<param name="rlMinViaOuter" value="8mil"/>
+<param name="rlMinViaOuter" value="5mil"/>
 <param name="rlMaxViaOuter" value="20mil"/>
-<param name="rlMinViaInner" value="8mil"/>
+<param name="rlMinViaInner" value="5mil"/>
 <param name="rlMaxViaInner" value="20mil"/>
 <param name="rlMinMicroViaOuter" value="4mil"/>
 <param name="rlMaxMicroViaOuter" value="20mil"/>
@@ -242,7 +243,7 @@ design rules under a new name.
 <signal name="S$1">
 HEAD
 
-FOOT=<<FOOT
+EAGLE_FOOTER=<<FOOT
 </signal>
 </signals>
 </board>
@@ -278,5 +279,10 @@ MISC=<<MISC
 <wire x1="0" y1="-2.54" x2="2.794" y2="0" width="0.127" layer="1" curve="90"/>
 
 MISC
-#
+
 WIRE_BEND = '<wire x1="%f" y1="%f" x2="%f" y2="%f" width="%f" layer="%i" curve="%f"/>'
+WIRE = '<wire x1="%f" y1="%f" x2="%f" y2="%f" width="%f" layer="%i"/>'
+VIA = '<via x="%f" y="%f" extent="1-16" drill="%f"/>'
+VIA_PAD = '<via x="%f" y="%f" extent="1-16" drill="%f" diameter="%f"/>'
+
+
