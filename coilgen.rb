@@ -57,6 +57,7 @@ breakpoints = [0,90,180,270]
 
 layers  = [[]]*numlayers
 
+# Generate the windings
 layers = layers.each_with_index.map do |layers,i|
   path = (0..(coils*2*Math::PI)).step(angle_res).to_a
   # path.reverse! if index.even?
@@ -67,18 +68,63 @@ layers = layers.each_with_index.map do |layers,i|
   end
   # radius  = start
   # radius += rdiff
-  path
+  # path
 end
 
+# Add a lead-in and lead out
+begin
+  jog = drillsize/2.0 + annular - width/2.0
+  jog = 0 if width/2.0 > jog
+  c = [start + coils*pitch + width, -annular -drillsize/2.0]
+  x = start + coils*pitch + width + annular
+  y = annular + drillsize/2.0 + spacing
+  # Add lead in to coil
+  layers.first.push [x,y]
+  vias << [x,y]
+  # Add the lead out
+  layers.last.unshift [x,-y]
+  vias << [x,-y]
+end
+
+layerids=[1,16]
+layerids = [1,2,15,16] if layers.size == 4
+
+layers.zip(layerids).map do |layer,id|
+  File.open("coil.#{id}.xln","w") do |f|
+    f.puts GER_HEADER
+    f.puts format GER_APERTURE, 10, width.mil.to_in
+    f.puts format GER_APERTURE, 11, drillsize.mil.to_in + 2*annular.mil.to_in
+    f.puts format GER_AP_SELECT,10
+    f.puts format GER_XY,*layer.first.map{|c|c*10},2
+    layer.each do |xy|
+      f.puts format GER_XY,*xy.map{|c|c*10},1
+    end
+    f.puts format GER_AP_SELECT,11
+    vias.each do |via|
+      f.puts format GER_XY,*via.map{|c|c*10},3
+    end
+    f.puts GER_FOOTER
+  end
+end
+vias.tap do |layer|
+  File.open("coil.0.xln","w") do |f|
+    f.puts GER_HEADER
+    f.puts format GER_APERTURE, 10, drillsize.mil.to_in
+    f.puts format GER_AP_SELECT,10
+    layer.each do |xy|
+      f.puts format GER_XY,*xy.map{|c|c*10},3
+    end
+    f.puts GER_FOOTER
+  end
+end
+
+`gerbv -x png -o coil.png -D2000 -a *xln *ger`
+
+
 File.open("coil.brd","w") do |f|
-  f.puts EAGLE_HEADER
+    f.puts EAGLE_HEADER
 
   # f.puts vias.map{|xy| format "X%iY%iD03*", *xy.map{|c|c*10}.map{|c|c.to_i} }
-
-  # layerids = (1..16).step(1).to_a
-
-  layerids=[1,16]
-  layerids = [1,2,15,16] if layers.size == 4
 
   puts layerids: layerids.inspect
   puts layer_sizes: layers.map(&:size).inspect
