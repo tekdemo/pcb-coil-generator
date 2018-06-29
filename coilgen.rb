@@ -6,7 +6,7 @@ require 'pp'
 # Configure the coil setup, in mil
 width = 5
 spacing = 5
-drillsize = 10
+drillsize = 4
 annular = 5
 
 
@@ -15,7 +15,7 @@ coils = 2
 numlayers = 2
 
 # Crunch some numbers and get constants
-arc_segments=10.0
+arc_segments=60.0
 pitch = width.to_f + spacing.to_f
 angle_res = Math::PI*2/arc_segments
 rdiff = pitch.to_f / arc_segments.to_f
@@ -60,24 +60,19 @@ layers  = [[]]*numlayers
 # Generate the windings
 layers = layers.each_with_index.map do |layers,i|
   path = (0..(coils*2*Math::PI)).step(angle_res).to_a
-  # path.reverse! if index.even?
   path = path.each_with_index.map do |angle,j|
     radius += i.even? ? rdiff : -rdiff if j > 0
     c=[ Math::cos(angle), Math::sin(angle) ].map{|c|c*radius}
     c
   end
-  # radius  = start
-  # radius += rdiff
-  # path
 end
 
 # Add a lead-in and lead out
 begin
   jog = drillsize/2.0 + annular - width/2.0
   jog = 0 if width/2.0 > jog
-  c = [start + coils*pitch + width, -annular -drillsize/2.0]
-  x = start + coils*pitch + width + annular
-  y = annular + drillsize/2.0 + spacing
+  x = (start + coils*pitch) + spacing + width/2.0 + annular + drillsize/2
+  y = spacing/2.0 + annular + drillsize/2.0
   # Add lead in to coil
   layers.first.push [x,y]
   vias << [x,y]
@@ -90,7 +85,7 @@ layerids=[1,16]
 layerids = [1,2,15,16] if layers.size == 4
 
 layers.zip(layerids).map do |layer,id|
-  File.open("coil.#{id}.xln","w") do |f|
+  File.open("coil.#{id}.ger","w") do |f|
     f.puts GER_HEADER
     f.puts format GER_APERTURE, 10, width.mil.to_in
     f.puts format GER_APERTURE, 11, drillsize.mil.to_in + 2*annular.mil.to_in
@@ -118,7 +113,7 @@ vias.tap do |layer|
   end
 end
 
-`gerbv -x png -o coil.png -D2000 -a *xln *ger`
+`gerbv -x png -o coil.png -D2000 *xln *ger`
 
 
 File.open("coil.brd","w") do |f|
