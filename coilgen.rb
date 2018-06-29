@@ -12,7 +12,7 @@ annular = 5
 
 start = 40
 coils = 2
-numlayers = 2
+numlayers = 4
 
 # Crunch some numbers and get constants
 arc_segments=60.0
@@ -73,6 +73,15 @@ begin
   jog = 0 if width/2.0 > jog
   x = (start + coils*pitch) + spacing + width/2.0 + annular + drillsize/2
   y = spacing/2.0 + annular + drillsize/2.0
+
+  # Account for vias from middle layers
+  if numlayers > 2
+    ymod = spacing + annular + drillsize/2.0
+    layers.first.push [layers.first.last.first,ymod]
+    layers.last.unshift [layers.first.last.first,-ymod]
+    y += ymod
+  end
+
   # Add lead in to coil
   layers.first.push [x,y]
   vias << [x,y]
@@ -84,19 +93,27 @@ end
 # connect the layers together
 layers.each_cons(2).each_with_index do |l,i|
   a,b=l
-  offset = drillsize/2.0 + annular - width/2.0
-
+  x = a.first.first
+  xoffset = drillsize/2.0 + annular + width/2.0 + spacing
+  y = drillsize/2.0 + spacing/2.0 + annular
+  
   case i
   when 0
-    x = a.first.first - offset
+    # y = offset
+    x += -xoffset 
   when 1
-    x = a.first.first + offset
+    # x = xoffset
+    x += xoffset
+    y = 0
+  when 2
+    x += -xoffset 
+    y = -y
   else
-    x= [0,0]
+    next
   end
-  a.unshift [x,0]
-  b.push [x,0]
-  vias << [x,0]
+  a.unshift [x,y]
+  b.push [x,y]
+  vias << [x,y]
 end
 
 layerids=[1,16]
@@ -107,6 +124,7 @@ layers.zip(layerids).map do |layer,id|
     f.puts GER_HEADER
     f.puts format GER_APERTURE, 10, width.mil.to_in
     f.puts format GER_APERTURE, 11, drillsize.mil.to_in + 2*annular.mil.to_in
+    # f.puts format GER_APERTURE, 11, width.mil.to_in/2.0+1.mil.to_in
     f.puts format GER_AP_SELECT,10
     f.puts format GER_XY,*layer.first.map{|c|c*10},2
     layer.each do |xy|
@@ -114,6 +132,7 @@ layers.zip(layerids).map do |layer,id|
     end
     f.puts format GER_AP_SELECT,11
     vias.each do |via|
+      p via
       f.puts format GER_XY,*via.map{|c|c*10},3
     end
     f.puts GER_FOOTER
