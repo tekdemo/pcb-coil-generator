@@ -1,4 +1,5 @@
 require './eagle.rb'
+require './gerber.rb'
 require './units.rb'
 require 'pp'
 
@@ -31,7 +32,6 @@ breakpoints = [0,90,180,270]
   .map{|c|c-45}
   .each_with_index.map{|c,i|c+360*coils*i}
   .map{|c|c*Math::PI/180.0}
-p break_angles: breakpoints.map{|a|a/Math::PI*180}
 
 (0..(numlayers*coils*2*Math::PI)).step(angle_res) do |angle|
   layers.last << [ Math::cos(angle), Math::sin(angle) ].map{|c|c*radius}
@@ -55,26 +55,6 @@ p break_angles: breakpoints.map{|a|a/Math::PI*180}
   end
 end
 
-
-GER_HEAD=<<GER
-G04 This is an RS-274x file exported by *
-G04 gerbv version 2.6A *
-G04 More information is available about gerbv at *
-G04 http://gerbv.geda-project.org/ *
-G04 --End of header info--*
-%MOIN*%
-%FSLAX34Y34*%
-%IPPOS*%
-G04 --Define apertures--*
-%ADD10C,0.002*%
-%ADD11C,0.003*%
-%ADD12C,0.004*%
-%ADD13C,0.005*%
-GER
-
-GER_FOOT=<<GER
-M02*
-GER
 
 
 File.open("coil.ger","w") do |f|
@@ -109,7 +89,10 @@ File.open("coil.brd","w") do |f|
   # f.puts vias.map{|xy| format "X%iY%iD03*", *xy.map{|c|c*10}.map{|c|c.to_i} }
 
   layerids = (1..numlayers+1).step(1).to_a + [16]
-
+  # layerids=[1,16]
+  # layerids = [1,2,15,16] if numlayers = 4
+  puts layerids: layerids.inspect
+  puts layers: layers.map(&:size).inspect
   layers.each do |layer|
     f.puts layer.each_cons(2)
       .map{|a,b| format WIRE, *[*a,*b].map{|c|c.mil.to_mm},width.mil.to_mm,layerids.first.to_i }

@@ -12,6 +12,17 @@ EAGLE_HEADER= <<~HEAD
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="2" name="Route2" color="1" fill="2" visible="yes" active="yes"/>
 <layer number="3" name="Route3" color="4" fill="2" visible="yes" active="yes"/>
+<layer number="4" name="Route3" color="4" fill="2" visible="yes" active="yes"/>
+<layer number="5" name="Route3" color="5" fill="2" visible="yes" active="yes"/>
+<layer number="6" name="Route3" color="6" fill="2" visible="yes" active="yes"/>
+<layer number="7" name="Route3" color="7" fill="2" visible="yes" active="yes"/>
+<layer number="8" name="Route3" color="8" fill="2" visible="yes" active="yes"/>
+<layer number="9" name="Route3" color="9" fill="2" visible="yes" active="yes"/>
+<layer number="10" name="Route3" color="10" fill="2" visible="yes" active="yes"/>
+<layer number="11" name="Route3" color="11" fill="2" visible="yes" active="yes"/>
+<layer number="12" name="Route3" color="12" fill="2" visible="yes" active="yes"/>
+<layer number="13" name="Route3" color="13" fill="2" visible="yes" active="yes"/>
+<layer number="14" name="Route3" color="14" fill="2" visible="yes" active="yes"/>
 <layer number="15" name="Route15" color="1" fill="2" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
