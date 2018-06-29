@@ -1,4 +1,5 @@
 require './eagle.rb'
+require './kicad.rb'
 require './gerber.rb'
 require './units.rb'
 require 'pp'
@@ -89,10 +90,7 @@ layers.each_cons(2).each_with_index do |l,i|
   vias << [x,y]
 end
 
-layerids=[1,16]
-layerids = [1,2,15,16] if layers.size == 4
-
-layers.zip(layerids).map do |layer,id|
+layers.each_with_index do |layer,id|
   File.open("coil.#{id}.ger","w") do |f|
     f.puts GER_HEADER
     f.puts format GER_APERTURE, 10, width.mil.to_in
@@ -104,7 +102,6 @@ layers.zip(layerids).map do |layer,id|
     end
     f.puts format GER_AP_SELECT,11
     vias.each do |via|
-      p via
       f.puts format GER_XY,*via.map{|c|c*10},3
     end
     f.puts GER_FOOTER
@@ -127,6 +124,9 @@ end
 
 # Generate some Eagle files.
 begin 
+  layerids=[1,16]
+  layerids = [1,2,15,16] if layers.size == 4
+
   # Wiring is the same everywhere. 
   wires= layers.map do |layer|
     layerid = layerids.shift
@@ -155,4 +155,22 @@ begin
     package = format LBR_PACKAGE , "COIL_SAMPLE", package.join("\n")
     f.puts format LBR_FILE, package
   end
+end
+
+File.open("coil.kicad_pcb","w") do |f|
+  f.puts format KICAD_HEADER, layers.size == 4 ? KICAD_LAYER_STRING_4 : KICAD_LAYER_STRING_2
+
+  layers.each_with_index do |layer,i|
+    layer.each_cons(2) do |a,b|
+      layername = layers.size == 4 ? KICAD_LAYERS_4[i] : KICAD_LAYERS_2[i]
+      layername = layername[1]
+      f.puts format(KICAD_WIRE, *[*a,*b,width].map{|c|c.mil.to_mm}, layername)
+    end
+  end
+
+  vias.each_with_index do |via,i|
+    f.puts format KICAD_VIA, *[*via, drillsize ,(annular+drillsize)/2].map{|c|c.mil.to_mm}
+  end
+  f.puts KICAD_FOOTER
+
 end
