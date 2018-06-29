@@ -10,7 +10,7 @@ drillsize = 10
 annular = 5
 
 inner_diameter = 200
-coils = 10
+coils = 5
 numlayers = 4
 
 # Crunch some numbers and get constants
@@ -125,24 +125,34 @@ end
 # Generate a preview of the gerbers
 `gerbv -x png -o coil.png -D600 -a *xln *ger`
 
-
-File.open("coil.brd","w") do |f|
-  f.puts EAGLE_HEADER
-
-  layers.each do |layer|
-    f.puts layer.each_cons(2)
-      .map{|a,b| format WIRE, *[*a,*b].map{|c|c.mil.to_mm},width.mil.to_mm,layerids.first.to_i }
-    layerids.shift
+# Generate some Eagle files.
+begin 
+  # Wiring is the same everywhere. 
+  wires= layers.map do |layer|
+    layerid = layerids.shift
+    layer.each_cons(2)
+    .map{|a,b| format WIRE, *[*a,*b,width].map{|c|c.mil.to_mm},layerid.to_i }
+  end
+  
+  File.open("coil.brd","w") do |f|
+    f.puts BRD_HEADER
+    f.puts wires
+    vias.each_with_index do |via,i|
+      f.puts format VIA_PAD, *[*via, drillsize, (annular+drillsize)/2 ].map{|c|c.mil.to_mm}
+    end
+    f.puts BRD_FOOTER
   end
 
-  vias.each do |via|
-    p vias
-    f.puts format VIA_PAD, *[*via, drillsize, (annular+drillsize)/2 ].map{|c|c.mil.to_mm}
+  File.open("coil.lbr","w") do |f|
+    package = []
+
+    package += vias.each_with_index.map do |via,i|
+      mask = i<2 ? "yes" : "no"
+      format LBR_PAD,"P$#{i+1}",*[*via,drillsize].map{|c|c.mil.to_mm},mask
+    end
+  
+    package += wires
+    package = format LBR_PACKAGE , "COIL_SAMPLE", package.join("\n")
+    f.puts format LBR_FILE, package
   end
-
-  f.puts EAGLE_FOOTER
-end
-
-File.open("coil.lbr","w") do |f|
-
 end

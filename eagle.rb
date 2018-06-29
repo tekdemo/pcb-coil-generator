@@ -1,4 +1,4 @@
-EAGLE_HEADER= <<~HEAD
+BRD_HEADER= <<~HEAD
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
 <eagle version="7.7.0">
@@ -254,7 +254,7 @@ design rules under a new name.
 <signal name="S$1">
 HEAD
 
-EAGLE_FOOTER=<<FOOT
+BRD_FOOTER=<<FOOT
 </signal>
 </signals>
 </board>
@@ -262,38 +262,123 @@ EAGLE_FOOTER=<<FOOT
 </eagle>
 FOOT
 
-MISC=<<MISC
-<wire x1="0" y1="0" x2="1.27" y2="0" width="0.127" layer="1"/>
-<wire x1="1.27" y1="0" x2="0" y2="1.27" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="1.27" x2="-1.27" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-1.27" y1="0" x2="0" y2="-1.27" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-1.27" x2="1.524" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="1.524" y1="0" x2="0" y2="1.524" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="1.524" x2="-1.524" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-1.524" y1="0" x2="0" y2="-1.524" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-1.524" x2="1.778" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="1.778" y1="0" x2="0" y2="1.778" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="1.778" x2="-1.778" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-1.778" y1="0" x2="0" y2="-1.778" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-1.778" x2="2.032" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="2.032" y1="0" x2="0" y2="2.032" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="2.032" x2="-2.032" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-2.032" y1="0" x2="0" y2="-2.032" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-2.032" x2="2.286" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="2.286" y1="0" x2="0" y2="2.286" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="2.286" x2="-2.286" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-2.286" y1="0" x2="0" y2="-2.286" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-2.286" x2="2.54" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="2.54" y1="0" x2="0" y2="2.54" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="2.54" x2="-2.54" y2="0" width="0.127" layer="1" curve="90"/>
-<wire x1="-2.54" y1="0" x2="0" y2="-2.54" width="0.127" layer="1" curve="90"/>
-<wire x1="0" y1="-2.54" x2="2.794" y2="0" width="0.127" layer="1" curve="90"/>
-
-MISC
-
 WIRE_BEND = '<wire x1="%f" y1="%f" x2="%f" y2="%f" width="%f" layer="%i" curve="%f"/>'
 WIRE = '<wire x1="%f" y1="%f" x2="%f" y2="%f" width="%f" layer="%i"/>'
 VIA = '<via x="%f" y="%f" extent="1-16" drill="%f"/>'
 VIA_PAD = '<via x="%f" y="%f" extent="1-16" drill="%f" diameter="%f"/>'
 
+
+
+
+# Put together a library file
+# Stop should be "yes" or "no"
+LBR_PAD='<pad name="%s" x="%f" y="%f" drill="%f" mask="%s"/>'
+
+LBR_PACKAGE=<<EOF
+<package name="%s">
+%s
+</package>
+EOF
+
+LBR_FILE=<<EOF
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE eagle SYSTEM "eagle.dtd">
+<eagle version="7.7.0">
+<drawing>
+<settings>
+<setting alwaysvectorfont="no"/>
+<setting verticaltext="up"/>
+</settings>
+<grid distance="10" unitdist="mil" unit="mil" style="lines" multiple="5" display="yes" altdistance="1" altunitdist="mil" altunit="mil"/>
+<layers>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="2" name="Route2" color="2" fill="2" visible="yes" active="yes"/>
+<layer number="15" name="Route15" color="3" fill="2" visible="yes" active="yes"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="yes"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="yes"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="29" name="tStop" color="7" fill="3" visible="no" active="yes"/>
+<layer number="30" name="bStop" color="7" fill="6" visible="no" active="yes"/>
+<layer number="31" name="tCream" color="7" fill="4" visible="no" active="yes"/>
+<layer number="32" name="bCream" color="7" fill="5" visible="no" active="yes"/>
+<layer number="33" name="tFinish" color="6" fill="3" visible="no" active="yes"/>
+<layer number="34" name="bFinish" color="6" fill="6" visible="no" active="yes"/>
+<layer number="35" name="tGlue" color="7" fill="4" visible="no" active="yes"/>
+<layer number="36" name="bGlue" color="7" fill="5" visible="no" active="yes"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="no" active="yes"/>
+<layer number="39" name="tKeepout" color="4" fill="11" visible="yes" active="yes"/>
+<layer number="40" name="bKeepout" color="1" fill="11" visible="yes" active="yes"/>
+<layer number="41" name="tRestrict" color="4" fill="10" visible="yes" active="yes"/>
+<layer number="42" name="bRestrict" color="1" fill="10" visible="yes" active="yes"/>
+<layer number="43" name="vRestrict" color="2" fill="10" visible="yes" active="yes"/>
+<layer number="44" name="Drills" color="7" fill="1" visible="no" active="yes"/>
+<layer number="45" name="Holes" color="7" fill="1" visible="no" active="yes"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="no" active="yes"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="no" active="yes"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
+<layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
+<layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
+<layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="97" name="Info" color="7" fill="1" visible="yes" active="yes"/>
+<layer number="98" name="Guide" color="6" fill="1" visible="yes" active="yes"/>
+</layers>
+<library>
+<packages>
+%s
+</packages>
+<symbols>
+<symbol name="COIL">
+<pin name="P$2" x="0" y="2.54" length="middle" rot="R180"/>
+<pin name="P$1" x="0" y="0" length="middle" rot="R180"/>
+<wire x1="-5.588" y1="2.54" x2="-13.208" y2="1.27" width="0.254" layer="94" curve="158.103748"/>
+<wire x1="-13.208" y1="1.27" x2="-6.096" y2="0" width="0.254" layer="94" curve="165.551305"/>
+<wire x1="-6.096" y1="0" x2="-12.7" y2="1.27" width="0.254" layer="94" curve="194.640685"/>
+<wire x1="-12.7" y1="1.27" x2="-6.604" y2="0" width="0.254" layer="94" curve="156.29401"/>
+<wire x1="-6.604" y1="0" x2="-5.588" y2="0" width="0.1524" layer="94" curve="-106.260205"/>
+<wire x1="-5.588" y1="0" x2="-5.08" y2="0" width="0.1524" layer="94"/>
+<wire x1="-5.588" y1="2.54" x2="-5.08" y2="2.54" width="0.1524" layer="94"/>
+<text x="-6.35" y="-2.54" size="1.27" layer="96">&gt;VALUE</text>
+<text x="-5.08" y="3.81" size="1.27" layer="96">&gt;NAME</text>
+</symbol>
+</symbols>
+<devicesets>
+<deviceset name="COIL">
+<gates>
+<gate name="G$1" symbol="COIL" x="2.54" y="-2.54"/>
+</gates>
+<devices>
+<device name="COIL_SAMPLE" package="COIL_SAMPLE">
+<connects>
+<connect gate="G$1" pin="P$1" pad="P$1"/>
+<connect gate="G$1" pin="P$2" pad="P$2"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+</devices>
+</deviceset>
+</devicesets>
+</library>
+</drawing>
+</eagle>
+EOF
 
