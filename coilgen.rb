@@ -6,7 +6,7 @@ require 'pp'
 # Configure the coil setup, in mil
 width = 5
 spacing = 5
-drillsize = 4
+drillsize = 10
 annular = 5
 
 
@@ -81,6 +81,24 @@ begin
   vias << [x,-y]
 end
 
+# connect the layers together
+layers.each_cons(2).each_with_index do |l,i|
+  a,b=l
+  offset = drillsize/2.0 + annular - width/2.0
+
+  case i
+  when 0
+    x = a.first.first - offset
+  when 1
+    x = a.first.first + offset
+  else
+    x= [0,0]
+  end
+  a.unshift [x,0]
+  b.push [x,0]
+  vias << [x,0]
+end
+
 layerids=[1,16]
 layerids = [1,2,15,16] if layers.size == 4
 
@@ -113,7 +131,7 @@ vias.tap do |layer|
   end
 end
 
-`gerbv -x png -o coil.png -D2000 *xln *ger`
+`gerbv -x png -o coil.png -D4000 -a *xln *ger`
 
 
 File.open("coil.brd","w") do |f|
